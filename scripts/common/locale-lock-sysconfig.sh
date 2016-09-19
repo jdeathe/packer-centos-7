@@ -1,9 +1,7 @@
 #!/bin/bash -e
 
-GUEST_LANG="${GUEST_LANG:-en_US.UTF-8}"
-
 /bin/echo '--> Locking locale.'
-/usr/bin/chattr +i /etc/sysconfig/i18n
+/usr/bin/chattr +i /etc/locale.conf
 
 # Reject SSH locale environment variables
 /bin/sed -i \
