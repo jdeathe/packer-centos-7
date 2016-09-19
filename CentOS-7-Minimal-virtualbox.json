@@ -1,0 +1,203 @@
+{
+  "variables": {
+    "build_export_format": "ovf",
+    "build_iso_checksum": "f90e4d28fa377669b2db16cbcb451fcb9a89d2460e3645993e30e137ac37d284",
+    "build_iso_checksum_type": "sha256",
+    "build_iso_filename": "CentOS-7-x86_64-Minimal-1511.iso",
+    "build_iso_target_path": "isos/x86_64",
+    "build_name": "CentOS-7.2.1511-x86_64-Minimal-en_US",
+    "build_output_directory": "builds",
+    "guest_boot_timeout": "0",
+    "guest_bootloader_append": "net.ifnames=0 biosdevname=0",
+    "guest_cpus": "1",
+    "guest_firewall_disabled": "false",
+    "guest_hard_disk_size": "40960",
+    "guest_keyboard": "us",
+    "guest_language": "en_US.UTF-8",
+    "guest_lv_root_fstype": "ext4",
+    "guest_lv_root_size": "1024",
+    "guest_lv_swap_size": "4096",
+    "guest_name": "CentOS-7.2.1511-x86_64-Minimal-en_US",
+    "guest_partition_boot_fstype": "ext4",
+    "guest_partition_boot_size": "250",
+    "guest_memory": "512",
+    "guest_selinux": "permissive",
+    "guest_timezone": "Etc/UTC",
+    "guest_vram": "16",
+    "guest_vg_root_reserved_space": "0",
+    "ssh_root_password": "vagrant",
+    "ssh_user": "vagrant",
+    "ssh_user_authorized_keys": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key",
+    "ssh_user_home": "/home/vagrant",
+    "ssh_user_password": "vagrant",
+    "ssh_user_shell": "/bin/bash",
+    "ssh_user_sudo": "ALL=(ALL) NOPASSWD:ALL"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "name": "{{user `build_name`}}",
+      "boot_command": [
+        "<esc><wait>",
+        "linux ks=http://{{.HTTPIP}}:{{.HTTPPort}}/CentOS-7-minimal.cfg",
+        " BOOT_TIMEOUT={{user `guest_boot_timeout`}}",
+        " BOOTLOADER_APPEND=\"{{user `guest_bootloader_append`}}\"",
+        " BOOTLOADER_THEME=details",
+        " LANG={{user `guest_language`}}",
+        " KEYTABLE={{user `guest_keyboard`}}",
+        " TIMEZONE={{user `guest_timezone`}}",
+        " ROOTPW={{user `ssh_root_password`}}",
+        " FIREWALL_DISABLED={{user `guest_firewall_disabled`}}",
+        " SELINUX={{user `guest_selinux`}}",
+        " LV_ROOT_FSTYPE={{user `guest_lv_root_fstype`}}",
+        " LV_ROOT_SIZE={{user `guest_lv_root_size`}}",
+        " LV_SWAP_SIZE={{user `guest_lv_swap_size`}}",
+        " PART_BOOT_FSTYPE={{user `guest_partition_boot_fstype`}}",
+        " PART_BOOT_SIZE={{user `guest_partition_boot_size`}}",
+        " VG_ROOT_RESERVED_SPACE={{user `guest_vg_root_reserved_space`}}",
+        "<enter><wait>"
+      ],
+      "boot_wait": "3s",
+      "disk_size": "{{user `guest_hard_disk_size`}}",
+      "format": "{{user `build_export_format`}}",
+      "guest_additions_mode": "disable",
+      "guest_os_type": "RedHat_64",
+      "hard_drive_interface": "sata",
+      "headless": true,
+      "http_directory": "http",
+      "iso_checksum": "{{user `build_iso_checksum`}}",
+      "iso_checksum_type": "{{user `build_iso_checksum_type`}}",
+      "iso_interface": "sata",
+      "iso_target_path": "{{user `build_iso_target_path`}}",
+      "iso_url": "{{user `build_iso_target_path`}}/{{user `build_iso_filename`}}",
+      "ssh_username": "root",
+      "ssh_password": "{{user `ssh_root_password`}}",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10m",
+      "shutdown_command": "/sbin/shutdown --no-wall -P now",
+      "shutdown_timeout": "1m",
+      "vboxmanage": [
+        ["modifyvm","{{.Name}}","--cpus","1"],
+        ["modifyvm","{{.Name}}","--memory","1024"],
+        ["modifyvm","{{.Name}}","--vram","8"],
+        ["modifyvm","{{.Name}}","--hpet","on"],
+        ["modifyvm","{{.Name}}","--accelerate3d","off"],
+        ["modifyvm","{{.Name}}","--accelerate2dvideo","off"],
+        ["modifyvm","{{.Name}}","--bioslogofadein","off"],
+        ["modifyvm","{{.Name}}","--bioslogofadeout","off"],
+        ["modifyvm","{{.Name}}","--bioslogodisplaytime","0"],
+        ["modifyvm","{{.Name}}","--biosbootmenu","disabled"],
+        ["modifyvm","{{.Name}}","--clipboard","disabled"],
+        ["modifyvm","{{.Name}}","--draganddrop","disabled"],
+        ["modifyvm","{{.Name}}","--usb","off"],
+        ["modifyvm","{{.Name}}","--audio","none"],
+        ["modifyvm","{{.Name}}","--videocap","off"]
+      ],
+      "vboxmanage_post": [
+        ["modifyvm","{{.Name}}","--cpus","{{user `guest_cpus`}}"],
+        ["modifyvm","{{.Name}}","--memory","{{user `guest_memory`}}"],
+        ["modifyvm","{{.Name}}","--vram","{{user `guest_vram`}}"],
+        ["modifyvm","{{.Name}}","--vrde","off"],
+        ["storagectl","{{.Name}}","--name","IDE Controller","--remove"],
+        ["storagectl","{{.Name}}","--name","SATA Controller","--hostiocache","off"]
+      ],
+      "virtualbox_version_file": ".vbox_version",
+      "vm_name": "{{user `guest_name`}}"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "compress",
+      "output": "{{user `build_output_directory`}}/{{.BuildName}}.{{user `build_export_format`}}.tar.gz",
+      "compression_level": 9,
+      "keep_input_artifact": true
+    },
+    [
+      {
+        "type": "artifice",
+        "files": [
+          "CentOS-7.Vagrantfile"
+        ]
+      },
+      {
+        "type": "shell-local",
+        "execute_command": "chmod +x {{.Path}}; {{.Vars}} /bin/bash {{.Path}}",
+        "inline_shebang": "/bin/bash -e",
+        "inline": [
+          "if [[ ! -d output-tmp ]]; then",
+          "   mkdir output-tmp",
+          "fi",
+          "if [[ -n ${1} ]] && [[ -f ${1} ]]; then",
+          "  echo '--> Generating Vagrantfile template.'",
+          "  cp -pf ${1} output-tmp/${1}",
+          "  sed -e 's~[{][{]user `ssh_user`[}][}]~{{user `ssh_user`}}~g' output-tmp/${1} > ${1}",
+          "fi"
+        ]
+      }
+    ],
+    {
+      "type": "vagrant",
+      "vagrantfile_template": "CentOS-7.Vagrantfile",
+      "output": "{{user `build_output_directory`}}/{{.BuildName}}-{{.Provider}}.box",
+      "compression_level": 9,
+      "keep_input_artifact": true
+    },
+    [
+      {
+        "type": "artifice",
+        "files": [
+          "output-tmp/CentOS-7.Vagrantfile"
+        ]
+      },
+      {
+        "type": "shell-local",
+        "execute_command": "chmod +x {{.Path}}; {{.Vars}} /bin/bash {{.Path}}",
+        "inline_shebang": "/bin/bash -e",
+        "inline": [
+          "if [[ -n ${1} ]] && [[ -f ${1} ]]; then",
+          "  echo '--> Restoring Vagrantfile template.'",
+          "  mv -f ${1} .",
+          "fi",
+          "echo '--> Cleanup output directories.'",
+          "find . -mindepth 1 -maxdepth 1 -type d -name \"output-*\" -exec rm -rf '{}' +"
+        ]
+      }
+    ]
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "chmod +x {{.Path}}; env {{.Vars}} /bin/bash {{.Path}}",
+      "remote_folder": "/var/tmp",
+      "skip_clean": false,
+      "environment_vars": [
+        "GUEST_LANG={{user `guest_language`}}",
+        "SSH_USER={{user `ssh_user`}}",
+        "SSH_USER_AUTHORIZED_KEYS={{user `ssh_user_authorized_keys`}}",
+        "SSH_USER_HOME={{user `ssh_user_home`}}",
+        "SSH_USER_PASSWORD={{user `ssh_user_password`}}",
+        "SSH_USER_SHELL={{user `ssh_user_shell`}}",
+        "SSH_USER_SUDO={{user `ssh_user_sudo`}}"
+      ],
+      "scripts": [
+        "scripts/install/tuned-virtual-guest.sh",
+        "scripts/common/ifcfg-name-to-device.sh",
+        "scripts/common/sshd-config-non-root-key-auth.sh",
+        "scripts/common/sudoers-default-not-requiretty.sh",
+        "scripts/common/ssh-user.sh",
+        "scripts/common/seal-virtual-guest.sh",
+        "scripts/common/locale-trim-definitions.sh",
+        "scripts/common/locale-trim-translations.sh",
+        "scripts/common/locale-lock-sysconfig.sh",
+        "scripts/common/purge-documentation.sh",
+        "scripts/common/purge-desktop-graphics.sh",
+        "scripts/common/purge-temporary-directories.sh",
+        "scripts/common/yum-cleanup.sh",
+        "scripts/common/rpm-rebuild-db.sh",
+        "scripts/common/stop-and-truncate-logs.sh",
+        "scripts/common/zero-out-disks.sh",
+        "scripts/common/lock-root-user.sh"
+      ]
+    }
+  ]
+}
