@@ -1,0 +1,16 @@
+{
+  "build_iso_checksum": "783eef50e1fb91c78901d0421d8114a29b998478",
+  "build_iso_checksum_type": "sha1",
+  "build_iso_filename": "CentOS-7-x86_64-Minimal-1511.iso",
+  "build_iso_target_path": "isos/x86_64",
+  "build_name": "CentOS-7.2.1511-x86_64-Minimal-Cloud-Init-en_US",
+  "guest_hard_disk_size": "40960",
+  "guest_keyboard": "us",
+  "guest_language": "en_US.UTF-8",
+  "guest_lv_swap_size": "4096",
+  "guest_name": "CentOS-7.2.1511-x86_64-Minimal-Cloud-Init-en_US",
+  "guest_partition_boot_size": "250",
+  "guest_memory": "512",
+  "guest_selinux": "permissive",
+  "guest_vg_root_reserved_space": "0"
+}
