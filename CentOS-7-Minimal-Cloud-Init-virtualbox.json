@@ -183,6 +183,7 @@
         "scripts/install/tuned-virtual-guest.sh",
         "scripts/install/cloud-init.sh",
         "scripts/cloud-init/disable-locale-module.sh",
+        "scripts/cloud-init/add-datasource-list.sh",
         "scripts/common/ifcfg-name-to-device.sh",
         "scripts/common/sshd-config-non-root-key-auth.sh",
         "scripts/common/sudoers-default-not-requiretty.sh",
