@@ -29,7 +29,7 @@ Variables (default value):
                             an additonal locale to en_US. e.g. en_GB
   - BOX_OUTPUT_PATH         Ouput directory path - where the final build
     (./builds)              artifacts are placed.
-  - BOX_VARIANT (minimal)   Used to specify box build variants. i.e.
+  - BOX_VARIANT (Minimal)   Used to specify box build variants. i.e.
                               - Minimal
                               - Minimal-Cloud-Init
   - BOX_VERSION_RELEASE     The CentOS-7 Minor Release number. Note: A
