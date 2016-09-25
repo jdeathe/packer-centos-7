@@ -5,8 +5,11 @@
   /etc/cloud/cloud.cfg.d/10_datasource.cfg \
   1> /dev/null \
   <<-EOF
-datasource: 
-   Ec2: 
-     timeout: 10
-     max_wait: 60
+datasource:
+  CloudStack:
+     timeout: 15
+     max_wait: 30
+  Ec2:
+    timeout: 15
+    max_wait: 30
 EOF
