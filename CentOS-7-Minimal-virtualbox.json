@@ -180,6 +180,7 @@
         "SSH_USER_SUDO={{user `ssh_user_sudo`}}"
       ],
       "scripts": [
+        "scripts/install/nfs-utils.sh",
         "scripts/install/tuned-virtual-guest.sh",
         "scripts/common/ifcfg-name-to-device.sh",
         "scripts/common/sshd-config-non-root-key-auth.sh",

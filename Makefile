@@ -1,11 +1,47 @@
 export SHELL := /usr/bin/env bash
 export PATH := ${PATH}
 
+define USAGE
+Usage: make [options] [target] ...
+Usage: VARIABLE="VALUE" make [options] -- [target] ...
+
+This Makefile allows you to build a Vagrant box file from a template and
+with Packer.
+
+Targets:
+  all                       Combines targets build and install.
+  build                     Runs the packer build job. This is the
+                            default target.
+  download-iso              Download the source ISO image - required to
+                            build the Virtual Machine. Packer should
+                            be capable of downloading the source however
+                            this feature can fail.
+  help                      Show this help.
+  install                   Used to install the Vagrant box with a
+                            unique name based on the sha1 sum of
+                            the box file. It will output a minimal
+                            Vagrantfile source that can be used for
+                            testing the build before release.
+
+Variables (default value):
+  - BOX_DEBUG (false)       Set to true to build in packer debug mode.
+  - BOX_LANG (en_US)        The locale code, used to build a box with
+                            an additonal locale to en_US. e.g. en_GB
+  - BOX_OUTPUT_PATH         Ouput directory path - where the final build
+    (./builds)              artifacts are placed.
+  - BOX_VARIANT (Minimal)   Used to specify box build variants. i.e.
+                              - Minimal
+                              - Minimal-Cloud-Init
+  - BOX_VERSION_RELEASE     The CentOS-7 Minor Release number. Note: A
+    (7.2.1511)              corresponding template is required.
+
+endef
+
 BOX_NAMESPACE := jdeathe
 BOX_PROVIDOR := virtualbox
 BOX_ARCH_PATTERN := ^(x86_64|i386)$
+BOX_ARCH := x86_64
 
-BOX_ARCH ?= x86_64
 BOX_DEBUG ?= false
 BOX_LANG ?= en_US
 BOX_OUTPUT_PATH ?= ./builds
@@ -19,35 +55,35 @@ COLOUR_RESET := \033[0m
 CHARACTER_STEP := ==>
 PREFIX_STEP := $(shell \
 	printf -- '%s ' \
-	"$(CHARACTER_STEP)"; \
+		"$(CHARACTER_STEP)"; \
 )
 PREFIX_SUB_STEP := $(shell \
 	printf -- ' %s ' \
-	"$(CHARACTER_STEP)"; \
+		"$(CHARACTER_STEP)"; \
 )
 PREFIX_STEP_NEGATIVE := $(shell \
 	printf -- '%b%s%b' \
-	"$(COLOUR_NEGATIVE)" \
-	"$(PREFIX_STEP)" \
-	"$(COLOUR_RESET)"; \
+		"$(COLOUR_NEGATIVE)" \
+		"$(PREFIX_STEP)" \
+		"$(COLOUR_RESET)"; \
 )
 PREFIX_STEP_POSITIVE := $(shell \
 	printf -- '%b%s%b' \
-	"$(COLOUR_POSITIVE)" \
-	"$(PREFIX_STEP)" \
-	"$(COLOUR_RESET)"; \
+		"$(COLOUR_POSITIVE)" \
+		"$(PREFIX_STEP)" \
+		"$(COLOUR_RESET)"; \
 )
 PREFIX_SUB_STEP_NEGATIVE := $(shell \
 	printf -- '%b%s%b' \
-	"$(COLOUR_NEGATIVE)" \
-	"$(PREFIX_SUB_STEP)" \
-	"$(COLOUR_RESET)"; \
+		"$(COLOUR_NEGATIVE)" \
+		"$(PREFIX_SUB_STEP)" \
+		"$(COLOUR_RESET)"; \
 )
 PREFIX_SUB_STEP_POSITIVE := $(shell \
 	printf -- '%b%s%b' \
-	"$(COLOUR_POSITIVE)" \
-	"$(PREFIX_SUB_STEP)" \
-	"$(COLOUR_RESET)"; \
+		"$(COLOUR_POSITIVE)" \
+		"$(PREFIX_SUB_STEP)" \
+		"$(COLOUR_RESET)"; \
 )
 
 .DEFAULT_GOAL := build
@@ -91,15 +127,52 @@ vagrant := $(shell type -p vagrant)
 vboxmanage := $(shell type -p vboxmanage)
 
 .PHONY: \
+	_prerequisites \
+	_require-supported-architecture \
+	_usage \
 	all \
 	build \
-	install \
-	prerequisites \
-	require-supported-architecture
+	help \
+	install
 
-all: prerequisites | build
+_prerequisites:
+ifeq ($(vboxmanage),)
+	$(error "Please install VirtualBox. (https://www.virtualbox.org/)")
+endif
 
-build: prerequisites require-supported-architecture download-iso
+ifeq ($(vagrant),)
+	$(error "Please install Vagrant. (https://www.vagrantup.com)")
+endif
+
+ifeq ($(packer),)
+	$(error "Please install Packer. (https://www.packer.io)")
+endif
+
+ifeq ($(curl),)
+	$(error "Please install the curl package.")
+endif
+
+ifeq ($(gzip),)
+	$(error "Please install the gzip package.")
+endif
+
+ifeq ($(openssl),)
+	$(error "Please install the openssl package.")
+endif
+
+_require-supported-architecture:
+	@ if [[ ! $(BOX_ARCH) =~ $(BOX_ARCH_PATTERN) ]]; then \
+			echo "$(PREFIX_STEP_NEGATIVE)Unsupported architecture ($(BOX_ARCH))" >&2; \
+			echo "$(PREFIX_SUB_STEP)Supported values: x86_64|i386." >&2; \
+			exit 1; \
+		fi
+
+_usage:
+	@: $(info $(USAGE))
+
+all: _prerequisites | build
+
+build: _prerequisites _require-supported-architecture | download-iso
 	@ echo "$(PREFIX_STEP)Building $(PACKER_BUILD_NAME)"
 	@ if [[ ! -f $(PACKER_VAR_FILE) ]]; then \
 			echo "$(PREFIX_SUB_STEP_NEGATIVE)Missing var-file: $(PACKER_VAR_FILE)" >&2; \
@@ -133,7 +206,7 @@ build: prerequisites require-supported-architecture download-iso
 			fi; \
 		fi
 
-download-iso: prerequisites require-supported-architecture
+download-iso: _prerequisites _require-supported-architecture
 	@ if [[ ! -f isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) ]]; then \
 			if [[ ! -d ./isos/$(BOX_ARCH) ]]; then \
 				mkdir -p ./isos/$(BOX_ARCH); \
@@ -154,7 +227,9 @@ download-iso: prerequisites require-supported-architecture
 			fi; \
 		fi
 
-install: prerequisites require-supported-architecture
+help: _usage
+
+install: _prerequisites _require-supported-architecture
 	$(eval $@_box_name := $(shell \
 		echo "$(PACKER_BUILD_NAME)" \
 			| awk '{ print tolower($$1); }' \
@@ -179,36 +254,3 @@ install: prerequisites require-supported-architecture
 			echo "$(PREFIX_STEP_NEGATIVE)No box file."; \
 			echo "$(PREFIX_SUB_STEP)Try running: make build"; \
 		fi
-
-prerequisites:
-ifeq ($(vboxmanage),)
-	$(error "Please install VirtualBox. (https://www.virtualbox.org/)")
-endif
-
-ifeq ($(vagrant),)
-	$(error "Please install Vagrant. (https://www.vagrantup.com)")
-endif
-
-ifeq ($(packer),)
-	$(error "Please install Packer. (https://www.packer.io)")
-endif
-
-ifeq ($(curl),)
-	$(error "Please install the curl package.")
-endif
-
-ifeq ($(gzip),)
-	$(error "Please install the gzip package.")
-endif
-
-ifeq ($(openssl),)
-	$(error "Please install the openssl package.")
-endif
-
-require-supported-architecture:
-	@ if [[ ! $(BOX_ARCH) =~ $(BOX_ARCH_PATTERN) ]]; then \
-			echo "$(PREFIX_STEP_NEGATIVE)Unsupported architecture ($(BOX_ARCH))" >&2; \
-			echo "$(PREFIX_SUB_STEP)Supported values: x86_64|i386." >&2; \
-			exit 1; \
-		fi
-
