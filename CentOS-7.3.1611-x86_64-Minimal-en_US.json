@@ -9,7 +9,7 @@
   "guest_language": "en_US.UTF-8",
   "guest_lv_swap_size": "4096",
   "guest_name": "CentOS-7.3.1611-x86_64-Minimal-en_US",
-  "guest_partition_boot_size": "250",
+  "guest_partition_boot_size": "1024",
   "guest_memory": "512",
   "guest_selinux": "permissive",
   "guest_vg_root_reserved_space": "0"
