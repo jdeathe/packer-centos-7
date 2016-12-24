@@ -33,7 +33,7 @@ Variables (default value):
                               - Minimal
                               - Minimal-Cloud-Init
   - BOX_VERSION_RELEASE     The CentOS-7 Minor Release number. Note: A
-    (7.2.1511)              corresponding template is required.
+    (7.3.1611)              corresponding template is required.
 
 endef
 
@@ -46,7 +46,7 @@ BOX_DEBUG ?= false
 BOX_LANG ?= en_US
 BOX_OUTPUT_PATH ?= ./builds
 BOX_VARIANT ?= Minimal
-BOX_VERSION_RELEASE ?= 7.2.1511
+BOX_VERSION_RELEASE ?= 7.3.1611
 
 # UI constants
 COLOUR_NEGATIVE := \033[1;31m
@@ -162,10 +162,10 @@ endif
 
 _require-supported-architecture:
 	@ if [[ ! $(BOX_ARCH) =~ $(BOX_ARCH_PATTERN) ]]; then \
-			echo "$(PREFIX_STEP_NEGATIVE)Unsupported architecture ($(BOX_ARCH))" >&2; \
-			echo "$(PREFIX_SUB_STEP)Supported values: x86_64|i386." >&2; \
-			exit 1; \
-		fi
+		echo "$(PREFIX_STEP_NEGATIVE)Unsupported architecture ($(BOX_ARCH))" >&2; \
+		echo "$(PREFIX_SUB_STEP)Supported values: x86_64|i386." >&2; \
+		exit 1; \
+	fi
 
 _usage:
 	@: $(info $(USAGE))
@@ -175,57 +175,57 @@ all: _prerequisites | build
 build: _prerequisites _require-supported-architecture | download-iso
 	@ echo "$(PREFIX_STEP)Building $(PACKER_BUILD_NAME)"
 	@ if [[ ! -f $(PACKER_VAR_FILE) ]]; then \
-			echo "$(PREFIX_SUB_STEP_NEGATIVE)Missing var-file: $(PACKER_VAR_FILE)" >&2; \
-			exit 1; \
-		elif [[ ! -f $(PACKER_TEMPLATE_NAME) ]]; then \
-			echo "$(PREFIX_SUB_STEP_NEGATIVE)Missing template: $(PACKER_TEMPLATE_NAME)" >&2; \
-			exit 1; \
+		echo "$(PREFIX_SUB_STEP_NEGATIVE)Missing var-file: $(PACKER_VAR_FILE)" >&2; \
+		exit 1; \
+	elif [[ ! -f $(PACKER_TEMPLATE_NAME) ]]; then \
+		echo "$(PREFIX_SUB_STEP_NEGATIVE)Missing template: $(PACKER_TEMPLATE_NAME)" >&2; \
+		exit 1; \
+	else \
+		if [[ $(BOX_DEBUG) == true ]]; then \
+			$(packer) build \
+				-debug \
+				-force \
+				-var-file=$(PACKER_VAR_FILE) \
+				$(PACKER_TEMPLATE_NAME); \
 		else \
-			if [[ $(BOX_DEBUG) == true ]]; then \
-				$(packer) build \
-					-debug \
-					-force \
-					-var-file=$(PACKER_VAR_FILE) \
-					$(PACKER_TEMPLATE_NAME); \
-			else \
-				$(packer) build \
-					-force \
-					-var-file=$(PACKER_VAR_FILE) \
-					$(PACKER_TEMPLATE_NAME); \
-			fi; \
-			if [[ $${?} -eq 0 ]]; then \
-				$(openssl) sha1 \
-					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box \
-					| awk '{ print $$2; }' \
-					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box.sha1; \
-				echo "$(PREFIX_SUB_STEP_POSITIVE)Build complete"; \
-			else \
-				rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box.sha1 &> /dev/null; \
-				echo "$(PREFIX_SUB_STEP_NEGATIVE)Build error" >&2; \
-				exit 1; \
-			fi; \
-		fi
+			$(packer) build \
+				-force \
+				-var-file=$(PACKER_VAR_FILE) \
+				$(PACKER_TEMPLATE_NAME); \
+		fi; \
+		if [[ $${?} -eq 0 ]]; then \
+			$(openssl) sha1 \
+				$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box \
+				| awk '{ print $$2; }' \
+				> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box.sha1; \
+			echo "$(PREFIX_SUB_STEP_POSITIVE)Build complete"; \
+		else \
+			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box.sha1 &> /dev/null; \
+			echo "$(PREFIX_SUB_STEP_NEGATIVE)Build error" >&2; \
+			exit 1; \
+		fi; \
+	fi
 
 download-iso: _prerequisites _require-supported-architecture
 	@ if [[ ! -f isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) ]]; then \
-			if [[ ! -d ./isos/$(BOX_ARCH) ]]; then \
-				mkdir -p ./isos/$(BOX_ARCH); \
-			fi; \
-			echo "$(PREFIX_STEP)Downloading ISO: http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
+		if [[ ! -d ./isos/$(BOX_ARCH) ]]; then \
+			mkdir -p ./isos/$(BOX_ARCH); \
+		fi; \
+		echo "$(PREFIX_STEP)Downloading ISO: http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
+		$(curl) -LSo ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
+			http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
+		if [[ $${?} -eq 0 ]]; then \
+			rm -f ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) &> /dev/null; \
+			echo "$(PREFIX_STEP)Download failed - trying vault: http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
 			$(curl) -LSo ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
-				http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
-			if [[ $${?} -eq 0 ]]; then \
-				rm -f ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) &> /dev/null; \
-				echo "$(PREFIX_STEP)Download failed - trying vault: http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
-				$(curl) -LSo ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
-					http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
-			fi; \
-			if [[ $${?} -eq 0 ]]; then \
-				echo "$(PREFIX_STEP_NEGATIVE)ISO Download failed" >&2; \
-				rm -f ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) &> /dev/null; \
-				exit 1; \
-			fi; \
-		fi
+				http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
+		fi; \
+		if [[ $${?} -eq 0 ]]; then \
+			echo "$(PREFIX_STEP_NEGATIVE)ISO Download failed" >&2; \
+			rm -f ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) &> /dev/null; \
+			exit 1; \
+		fi; \
+	fi
 
 help: _usage
 
@@ -244,13 +244,13 @@ install: _prerequisites _require-supported-architecture
 			| cut -c1-8 \
 	))
 	@ if [[ -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box ]]; then \
-			echo "$(PREFIX_STEP)Installing $(BOX_NAMESPACE)/$($@_box_name)/$($@_box_hash)"; \
-			$(vagrant) box add --force \
-				--name $(BOX_NAMESPACE)/$($@_box_name)/$($@_box_hash) \
-				$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box; \
-			echo "$(PREFIX_STEP)Vagrantfile:"; \
-			$(vagrant) init --output - --minimal $(BOX_NAMESPACE)/$($@_box_name)/$($@_box_hash); \
-		else \
-			echo "$(PREFIX_STEP_NEGATIVE)No box file."; \
-			echo "$(PREFIX_SUB_STEP)Try running: make build"; \
-		fi
+		echo "$(PREFIX_STEP)Installing $(BOX_NAMESPACE)/$($@_box_name)/$($@_box_hash)"; \
+		$(vagrant) box add --force \
+			--name $(BOX_NAMESPACE)/$($@_box_name)/$($@_box_hash) \
+			$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box; \
+		echo "$(PREFIX_STEP)Vagrantfile:"; \
+		$(vagrant) init --output - --minimal $(BOX_NAMESPACE)/$($@_box_name)/$($@_box_hash); \
+	else \
+		echo "$(PREFIX_STEP_NEGATIVE)No box file."; \
+		echo "$(PREFIX_SUB_STEP)Try running: make build"; \
+	fi
