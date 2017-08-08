@@ -32,7 +32,8 @@
     "ssh_user_home": "/home/vagrant",
     "ssh_user_password": "vagrant",
     "ssh_user_shell": "/bin/bash",
-    "ssh_user_sudo": "ALL=(ALL) NOPASSWD:ALL"
+    "ssh_user_sudo": "ALL=(ALL) NOPASSWD:ALL",
+    "vagrantfile_template": "CentOS-7.Vagrantfile"
   },
   "builders": [
     {
@@ -114,57 +115,41 @@
       "compression_level": 9,
       "keep_input_artifact": true
     },
-    [
-      {
-        "type": "artifice",
-        "files": [
-          "CentOS-7.Vagrantfile"
-        ]
-      },
-      {
-        "type": "shell-local",
-        "execute_command": "chmod +x \"{{.Script}}\"; {{.Vars}} /bin/bash \"{{.Script}}\"",
-        "inline_shebang": "/bin/bash -e",
-        "inline": [
-          "if [[ ! -d output-tmp ]]; then",
-          "   mkdir output-tmp",
-          "fi",
-          "if [[ -n ${1} ]] && [[ -f ${1} ]]; then",
-          "  echo '--> Generating Vagrantfile template.'",
-          "  cp -pf ${1} output-tmp/${1}",
-          "  sed -e 's~[{][{]user `ssh_user`[}][}]~{{user `ssh_user`}}~g' output-tmp/${1} > ${1}",
-          "fi"
-        ]
-      }
-    ],
+    {
+      "type": "shell-local",
+      "execute_command": "chmod +x \"{{.Script}}\"; {{.Vars}} /bin/bash \"{{.Script}}\" {{user `vagrantfile_template`}}",
+      "inline_shebang": "/bin/bash -e",
+      "inline": [
+        "if [[ ! -d output-tmp ]]; then",
+        "   mkdir output-tmp",
+        "fi",
+        "if [[ -n ${1} ]] && [[ -f ${1} ]]; then",
+        "  echo '--> Generating Vagrantfile template.'",
+        "  cp -pf ${1} output-tmp/${1}",
+        "  sed -e 's~[{][{]user `ssh_user`[}][}]~{{user `ssh_user`}}~g' output-tmp/${1} > ${1}",
+        "fi"
+      ]
+    },
     {
       "type": "vagrant",
-      "vagrantfile_template": "CentOS-7.Vagrantfile",
+      "vagrantfile_template": "{{user `vagrantfile_template`}}",
       "output": "{{user `build_output_directory`}}/{{.BuildName}}-{{.Provider}}.box",
       "compression_level": 9,
       "keep_input_artifact": true
     },
-    [
-      {
-        "type": "artifice",
-        "files": [
-          "output-tmp/CentOS-7.Vagrantfile"
-        ]
-      },
-      {
-        "type": "shell-local",
-        "execute_command": "chmod +x \"{{.Script}}\"; {{.Vars}} /bin/bash \"{{.Script}}\"",
-        "inline_shebang": "/bin/bash -e",
-        "inline": [
-          "if [[ -n ${1} ]] && [[ -f ${1} ]]; then",
-          "  echo '--> Restoring Vagrantfile template.'",
-          "  mv -f ${1} .",
-          "fi",
-          "echo '--> Cleanup output directories.'",
-          "find . -mindepth 1 -maxdepth 1 -type d -name \"output-*\" -exec rm -rf '{}' +"
-        ]
-      }
-    ]
+    {
+      "type": "shell-local",
+      "execute_command": "chmod +x \"{{.Script}}\"; {{.Vars}} /bin/bash \"{{.Script}}\" {{user `vagrantfile_template`}}",
+      "inline_shebang": "/bin/bash -e",
+      "inline": [
+        "if [[ -n ${1} ]] && [[ -f ${1} ]]; then",
+        "  echo '--> Restoring Vagrantfile template.'",
+        "  mv -f ${1} .",
+        "fi",
+        "echo '--> Cleanup output directories.'",
+        "find . -mindepth 1 -maxdepth 1 -type d -name \"output-*\" -exec rm -rf '{}' +"
+      ]
+    }
   ],
   "provisioners": [
     {
