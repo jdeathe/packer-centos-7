@@ -12,9 +12,9 @@ The build environment required is Mac OSX or GNU Linux.
 
 To build the box file you will need the following installed:
 
-- [VirtualBox](https://www.virtualbox.org) (5.0.26)
-- [Vagrant](https://www.vagrantup.com) (1.8.4)
-- [Packer](https://www.packer.io) (0.10.1)
+- [VirtualBox](https://www.virtualbox.org) (5.1.22)
+- [Vagrant](https://www.vagrantup.com) (1.9.5)
+- [Packer](https://www.packer.io) (1.0.0)
 
 ### Build
 
