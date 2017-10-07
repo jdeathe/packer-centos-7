@@ -33,7 +33,7 @@ Variables (default value):
                               - Minimal
                               - Minimal-Cloud-Init
   - BOX_VERSION_RELEASE     The CentOS-7 Minor Release number. Note: A
-    (7.3.1611)              corresponding template is required.
+    (7.4.1708)              corresponding template is required.
 
 endef
 
@@ -46,7 +46,7 @@ BOX_DEBUG ?= false
 BOX_LANG ?= en_US
 BOX_OUTPUT_PATH ?= ./builds
 BOX_VARIANT ?= Minimal
-BOX_VERSION_RELEASE ?= 7.3.1611
+BOX_VERSION_RELEASE ?= 7.4.1708
 
 # UI constants
 COLOUR_NEGATIVE := \033[1;31m
