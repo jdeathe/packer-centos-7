@@ -172,6 +172,7 @@
         "scripts/install/cloud-init.sh",
         "scripts/cloud-init/disable-locale-module.sh",
         "scripts/cloud-init/add-datasource-list.sh",
+        "scripts/cloud-init/add-logging-output.sh",
         "scripts/cloud-init/add-preserve-hostname.sh",
         "scripts/common/ifcfg-name-to-device.sh",
         "scripts/common/sshd-config-non-root-key-auth.sh",
