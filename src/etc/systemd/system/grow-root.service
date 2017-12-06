@@ -1,0 +1,52 @@
+# To install:
+#     sudo cat grow-root.service > /etc/systemd/system/grow-root.service
+#     sudo systemctl daemon-reload
+#     sudo systemctl enable -f grow-root.service
+#
+# Start (auto disables after first successful expansion):
+#     sudo systemctl start grow-root.service
+#
+# Debugging:
+#     sudo systemctl status grow-root.service
+#     journalctl -fn 50 -u grow-root.service
+#
+# To uninstall:
+#     sudo systemctl disable -f grow-root.service
+
+[Unit]
+DefaultDependencies=no
+Description=Grow root file system
+Requires=local-fs.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+Environment="BIN_FS_RESIZER=/sbin/resize2fs"
+Environment="DISK_DEVICE=/dev/xvda"
+Environment="LVM_LV_ROOT=lv_root"
+Environment="LVM_VG_ROOT=vg_root"
+Environment="PARTITION_NUMBER=3"
+Environment="PARTITION_TYPE=p"
+Environment="PARTITION_TYPE_CODE=8e"
+ExecStart=-/bin/bash -c \
+  "if (( $(/bin/lsblk -lp --output NAME,SIZE | /bin/grep \"^${DISK_DEVICE} \" | /usr/bin/grep -o ' [0-9]*' || printf -- '0') > $(( $(/bin/lsblk -lp --output NAME,SIZE | /bin/grep \"^${DISK_DEVICE}1\" | /usr/bin/grep -o ' [0-9]*' || printf -- '0') + $(/bin/lsblk -lp --output NAME,SIZE | /bin/grep -m 1 \"^/dev/mapper/${LVM_VG_ROOT}-${LVM_LV_ROOT}\" | /usr/bin/grep -o ' [0-9]*' || printf -- '0') )) )); then \
+    printf -- 'Space free on root volume\\n'; \
+    if ! /bin/lsblk -lp --output NAME,SIZE | /bin/grep -q \"^${DISK_DEVICE}${PARTITION_NUMBER}\"; then \
+      printf -- 'Growing root volume...\\n'; \
+      printf -- 'n\\n%%s\\n%%s\\n\\n\\nt\\n%%s\\n%%s\\nw\\n' \
+        \"${PARTITION_TYPE}\" \
+        \"${PARTITION_NUMBER}\" \
+        \"${PARTITION_NUMBER}\" \
+        \"${PARTITION_TYPE_CODE}\" \
+        | /sbin/fdisk ${DISK_DEVICE}; \
+      /sbin/partprobe -s; \
+      /sbin/pvcreate ${DISK_DEVICE}${PARTITION_NUMBER}; \
+      /sbin/vgextend ${LVM_VG_ROOT} ${DISK_DEVICE}${PARTITION_NUMBER}; \
+      /sbin/lvextend /dev/${LVM_VG_ROOT}/${LVM_LV_ROOT} ${DISK_DEVICE}${PARTITION_NUMBER}; \
+      ${BIN_FS_RESIZER} /dev/${LVM_VG_ROOT}/${LVM_LV_ROOT}; \
+      /bin/systemctl disable -f grow-root.service; \
+    fi; \
+  fi"
+
+[Install]
+WantedBy=local-fs.target
