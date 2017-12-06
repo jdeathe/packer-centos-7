@@ -31,6 +31,7 @@ Variables (default value):
     (./builds)              artifacts are placed.
   - BOX_VARIANT (Minimal)   Used to specify box build variants. i.e.
                               - Minimal
+                              - Minimal-AMI
                               - Minimal-Cloud-Init
   - BOX_VERSION_RELEASE     The CentOS-7 Minor Release number. Note: A
     (7.4.1708)              corresponding template is required.
@@ -194,13 +195,21 @@ build: _prerequisites _require-supported-architecture | download-iso
 				$(PACKER_TEMPLATE_NAME); \
 		fi; \
 		if [[ $${?} -eq 0 ]]; then \
-			$(openssl) sha1 \
-				$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box \
-				| awk '{ print $$2; }' \
-				> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box.sha1; \
+			if [[ -s $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box ]]; then \
+				$(openssl) sha1 \
+					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box \
+					| awk '{ print $$2; }' \
+					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box.sha1; \
+			elif [[ -s $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova ]]; then \
+				$(openssl) sha1 \
+					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova \
+					| awk '{ print $$2; }' \
+					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova.sha1; \
+			fi; \
 			echo "$(PREFIX_SUB_STEP_POSITIVE)Build complete"; \
 		else \
 			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box.sha1 &> /dev/null; \
+			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova.sha1 &> /dev/null; \
 			echo "$(PREFIX_SUB_STEP_NEGATIVE)Build error" >&2; \
 			exit 1; \
 		fi; \
