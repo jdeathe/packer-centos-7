@@ -53,13 +53,15 @@ Import the image from the S3 bucket `{{bucket_name}}`.
 
 ```
 $ aws ec2 import-image \
+  --region eu-west-1 \
   --cli-input-json '{ "LicenseType": "BYOL", "Description": "jdeathe/CentOS-7.4.1708-x86_64-Minimal-AMI-en_US", "DiskContainers": [ { "Description": "jdeathe/CentOS-7.4.1708-x86_64-Minimal-AMI-en_US", "Format": "ova", "UserBucket": { "S3Bucket": "{{bucket_name}}", "S3Key" : "CentOS-7.4.1708-x86_64-Minimal-AMI-en_US.ova" } } ]}'
 ```
 
 Check progress
 
 ```
-$ aws ec2 describe-import-image-tasks
+$ aws ec2 describe-import-image-tasks \
+  --region eu-west-1
 ```
 
 If you need to cancel the import:
@@ -94,6 +96,7 @@ Deregister the intermediate image that was created by the import process.
 
 ```
 $ aws ec2 deregister-image \
+  --region eu-west-1 \
   --image-id {{ImageId}}
 ```
 
@@ -101,6 +104,7 @@ Identify SpanshotId. i.e. With a Description starting "Created by AWS-VMImport s
 
 ```
 $ aws ec2 describe-snapshots \
+  --region eu-west-1 \
   --owner-ids self
 ```
 
@@ -108,6 +112,7 @@ Remove snapshot created by the import process.
 
 ```
 $ aws ec2 delete-snapshot \
+  --region eu-west-1 \
   --snapshot-id {{SnapshotId}}
 ```
 
