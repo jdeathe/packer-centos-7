@@ -41,7 +41,7 @@
       "name": "{{user `build_name`}}",
       "boot_command": [
         "<esc><wait>",
-        "linux ks=http://{{.HTTPIP}}:{{.HTTPPort}}/CentOS-7-minimal.cfg",
+        "linux ks=http://{{.HTTPIP}}:{{.HTTPPort}}/centos-7-minimal.cfg",
         " BOOT_TIMEOUT={{user `guest_boot_timeout`}}",
         " BOOTLOADER_APPEND=\"{{user `guest_bootloader_append`}}\"",
         " BOOTLOADER_THEME=details",
