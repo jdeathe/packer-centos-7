@@ -2,3 +2,4 @@
 builds/
 isos/
 output-*/
+packer_cache/
