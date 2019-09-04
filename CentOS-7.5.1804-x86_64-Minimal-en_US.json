@@ -4,6 +4,7 @@
   "build_iso_filename": "CentOS-7-x86_64-Minimal-1804.iso",
   "build_iso_target_path": "isos/x86_64",
   "build_name": "CentOS-7.5.1804-x86_64-Minimal-en_US",
+  "guest_bootloader_append": "net.ifnames=0 biosdevname=0 elevator=noop",
   "guest_hard_disk_size": "40960",
   "guest_keyboard": "us",
   "guest_language": "en_US.UTF-8",
