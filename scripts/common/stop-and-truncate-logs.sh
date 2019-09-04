@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 /bin/echo '--> Stopping logging services.'
-/usr/bin/systemctl stop auditd.service
+/sbin/service auditd stop
 /usr/bin/systemctl stop rsyslog.service
 
 /bin/echo '--> Truncate log files.'

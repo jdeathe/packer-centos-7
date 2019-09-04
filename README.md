@@ -2,7 +2,13 @@
 
 This provides the configuration and Makefile to build a [Vagrant](https://www.vagrantup.com) minimal base box using [Packer](https://www.packer.io). The base box is intended for server (terminal) use only so is restricted to a single locale (with `en_US` being the default) which allows for a smaller box size.
 
-There are templates provided for `CentOS-7.2.1511`, `CentOS-7.3.1611`, and `CentOS-7.4.1708` with `x86_64` architecture. There is currently no requirement to support older minor release versions or alternative architectures but they could be added if necessary.
+There are templates provided for the following with `x86_64` architecture:
+- CentOS-7.5.1804
+- CentOS-7.4.1708
+- CentOS-7.3.1611
+- CentOS-7.2.1511
+
+There is currently no requirement to support older minor release versions or alternative architectures but they could be added if necessary.
 
 ## Usage Instructions
 
@@ -12,19 +18,19 @@ The build environment required is Mac OSX or GNU Linux.
 
 To build the box file you will need the following installed:
 
-- [VirtualBox](https://www.virtualbox.org) (5.1.28)
-- [Vagrant](https://www.vagrantup.com) (2.0.0)
-- [Packer](https://www.packer.io) (1.1.0)
+- [VirtualBox](https://www.virtualbox.org) (6.0.10)
+- [Vagrant](https://www.vagrantup.com) (2.2.5)
+- [Packer](https://www.packer.io) (1.4.3)
 
 ### Build
 
-To build the latest `7.4.1708`, `x86_64` base box run `make` or `make build`.
+To build the latest, `x86_64` base box run `make` or `make build`.
 
 ```
 $ make
 ```
 
-To build the `7.2.1511` release version, use the `BOX_VERSION_RELEASE` environment variable.
+To build a specific release version, use the `BOX_VERSION_RELEASE` variable.
 
 ```
 $ BOX_VERSION_RELEASE=7.2.1511 make
