@@ -1,11 +1,11 @@
 {
   "variables": {
     "build_export_format": "ova",
-    "build_iso_checksum": "71a7aa147877b413497cdff5b1e0aa5bc0c9484f",
+    "build_iso_checksum": "13675c6f74880e7ff3481b91bdaf925ce81bda8f",
     "build_iso_checksum_type": "sha1",
-    "build_iso_filename": "CentOS-7-x86_64-Minimal-1708.iso",
+    "build_iso_filename": "CentOS-7-x86_64-Minimal-1804.iso",
     "build_iso_target_path": "isos/x86_64",
-    "build_name": "CentOS-7.4.1708-x86_64-Minimal-AMI-en_US",
+    "build_name": "CentOS-7.5.1804-x86_64-Minimal-AMI-en_US",
     "build_output_directory": "builds",
     "guest_boot_timeout": "0",
     "guest_bootloader_append": "net.ifnames=0 biosdevname=0",
@@ -18,9 +18,9 @@
     "guest_lv_root_mkfsoptions": "-i 4096",
     "guest_lv_root_size": "1024",
     "guest_lv_swap_size": "0",
-    "guest_name": "CentOS-7.4.1708-x86_64-Minimal-AMI-en_US",
+    "guest_name": "CentOS-7.5.1804-x86_64-Minimal-AMI-en_US",
     "guest_partition_boot_fstype": "ext4",
-    "guest_partition_boot_size": "250",
+    "guest_partition_boot_size": "1024",
     "guest_memory": "1024",
     "guest_selinux": "permissive",
     "guest_timezone": "Etc/UTC",
@@ -40,7 +40,7 @@
       "name": "{{user `build_name`}}",
       "boot_command": [
         "<esc><wait>",
-        "linux ks=http://{{.HTTPIP}}:{{.HTTPPort}}/CentOS-7-minimal.cfg",
+        "linux ks=http://{{.HTTPIP}}:{{.HTTPPort}}/centos-7-minimal.cfg",
         " BOOT_TIMEOUT={{user `guest_boot_timeout`}}",
         " BOOTLOADER_APPEND=\"{{user `guest_bootloader_append`}}\"",
         " BOOTLOADER_THEME=details",
@@ -92,8 +92,7 @@
         ["modifyvm","{{.Name}}","--clipboard","disabled"],
         ["modifyvm","{{.Name}}","--draganddrop","disabled"],
         ["modifyvm","{{.Name}}","--usb","off"],
-        ["modifyvm","{{.Name}}","--audio","none"],
-        ["modifyvm","{{.Name}}","--videocap","off"]
+        ["modifyvm","{{.Name}}","--audio","none"]
       ],
       "vboxmanage_post": [
         ["modifyvm","{{.Name}}","--cpus","{{user `guest_cpus`}}"],
