@@ -3,6 +3,7 @@
 This provides the configuration and Makefile to build a [Vagrant](https://www.vagrantup.com) minimal base box using [Packer](https://www.packer.io). The base box is intended for server (terminal) use only so is restricted to a single locale (with `en_US` being the default) which allows for a smaller box size.
 
 There are templates provided for the following with `x86_64` architecture:
+- CentOS-7.6.1810
 - CentOS-7.5.1804
 - CentOS-7.4.1708
 - CentOS-7.3.1611
