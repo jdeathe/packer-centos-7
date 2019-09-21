@@ -221,15 +221,21 @@ download-iso: _prerequisites _require-supported-architecture
 			mkdir -p ./isos/$(BOX_ARCH); \
 		fi; \
 		echo "$(PREFIX_STEP)Downloading ISO: http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
-		$(curl) -LSo ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
+		$(curl) \
+			--location \
+			--progress-bar \
+			--output ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
 			http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
-		if [[ $${?} -eq 0 ]]; then \
+		if [[ $${?} -ne 0 ]]; then \
 			rm -f ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) &> /dev/null; \
 			echo "$(PREFIX_STEP)Download failed - trying vault: http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
-			$(curl) -LSo ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
+			$(curl) \
+				--location \
+				--progress-bar \
+				--output ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
 				http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
 		fi; \
-		if [[ $${?} -eq 0 ]]; then \
+		if [[ $${?} -ne 0 ]]; then \
 			echo "$(PREFIX_STEP_NEGATIVE)ISO Download failed" >&2; \
 			rm -f ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) &> /dev/null; \
 			exit 1; \
