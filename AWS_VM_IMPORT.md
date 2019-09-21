@@ -43,8 +43,8 @@ Upload the ova image to the S3 bucket `{{bucket_name}}`.
 
 ```
 $ aws s3 cp \
-  builds/CentOS-7.4.1708-x86_64-Minimal-AMI-en_US.ova \
-  s3://{{bucket_name}}/CentOS-7.4.1708-x86_64-Minimal-AMI-en_US.ova
+  builds/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.ova \
+  s3://{{bucket_name}}/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.ova
 ```
 
 ### Import
@@ -54,7 +54,7 @@ Import the image from the S3 bucket `{{bucket_name}}`.
 ```
 $ aws ec2 import-image \
   --region eu-west-1 \
-  --cli-input-json '{ "LicenseType": "BYOL", "Description": "jdeathe/CentOS-7.4.1708-x86_64-Minimal-AMI-en_US", "DiskContainers": [ { "Description": "jdeathe/CentOS-7.4.1708-x86_64-Minimal-AMI-en_US", "Format": "ova", "UserBucket": { "S3Bucket": "{{bucket_name}}", "S3Key" : "CentOS-7.4.1708-x86_64-Minimal-AMI-en_US.ova" } } ]}'
+  --cli-input-json '{ "LicenseType": "BYOL", "Description": "jdeathe/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US", "DiskContainers": [ { "Description": "jdeathe/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US", "Format": "ova", "UserBucket": { "S3Bucket": "{{bucket_name}}", "S3Key" : "CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.ova" } } ]}'
 ```
 
 Check progress
@@ -85,8 +85,8 @@ Create copy of the intermediate image with required name and description values.
 $ aws ec2 copy-image \
   --source-region eu-west-1 \
   --region eu-west-1 \
-  --name "jdeathe/centos-7-x86_64-minimal-cloud-init-en_us-v7.4.0" \
-  --description "CentOS-7.4.1708 x86_64 Minimal Cloud-Init Base Image - en_US locale" \
+  --name "jdeathe/centos-7-x86_64-minimal-cloud-init-en_us-v7.7.0" \
+  --description "CentOS-7.7.1908 x86_64 Minimal Cloud-Init Base Image - en_US locale" \
   --source-image-id {{ImageId}}
 ```
 
@@ -120,5 +120,5 @@ Remove the source OVA image from the S3 bucket.
 
 ```
 $ aws s3 rm \
-  s3://{{bucket_name}}/CentOS-7.4.1708-x86_64-Minimal-AMI-en_US.ova
+  s3://{{bucket_name}}/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.ova
 ```
