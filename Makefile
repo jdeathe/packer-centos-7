@@ -34,20 +34,20 @@ Variables (default value):
                               - Minimal-AMI
                               - Minimal-Cloud-Init
   - BOX_VERSION_RELEASE     The CentOS-7 Minor Release number. Note: A
-    (7.6.1810)              corresponding template is required.
+    (7.7.1908)              corresponding template is required.
 
 endef
 
 BOX_NAMESPACE := jdeathe
 BOX_PROVIDOR := virtualbox
-BOX_ARCH_PATTERN := ^(x86_64|i386)$
+BOX_ARCH_PATTERN := ^x86_64$
 BOX_ARCH := x86_64
 
 BOX_DEBUG ?= false
 BOX_LANG ?= en_US
 BOX_OUTPUT_PATH ?= ./builds
 BOX_VARIANT ?= Minimal
-BOX_VERSION_RELEASE ?= 7.6.1810
+BOX_VERSION_RELEASE ?= 7.7.1908
 
 # UI constants
 COLOUR_NEGATIVE := \033[1;31m
@@ -221,15 +221,21 @@ download-iso: _prerequisites _require-supported-architecture
 			mkdir -p ./isos/$(BOX_ARCH); \
 		fi; \
 		echo "$(PREFIX_STEP)Downloading ISO: http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
-		$(curl) -LSo ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
+		$(curl) \
+			--location \
+			--progress-bar \
+			--output ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
 			http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
-		if [[ $${?} -eq 0 ]]; then \
+		if [[ $${?} -ne 0 ]]; then \
 			rm -f ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) &> /dev/null; \
 			echo "$(PREFIX_STEP)Download failed - trying vault: http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
-			$(curl) -LSo ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
+			$(curl) \
+				--location \
+				--progress-bar \
+				--output ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
 				http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
 		fi; \
-		if [[ $${?} -eq 0 ]]; then \
+		if [[ $${?} -ne 0 ]]; then \
 			echo "$(PREFIX_STEP_NEGATIVE)ISO Download failed" >&2; \
 			rm -f ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) &> /dev/null; \
 			exit 1; \
