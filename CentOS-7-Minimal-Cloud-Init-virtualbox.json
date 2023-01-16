@@ -60,7 +60,6 @@
         " VG_ROOT_RESERVED_SPACE={{user `guest_vg_root_reserved_space`}}",
         "<enter><wait>"
       ],
-      "boot_key_interval": "10ms",
       "boot_keygroup_interval": "1s",
       "boot_wait": "3s",
       "disk_size": "{{user `guest_hard_disk_size`}}",
@@ -71,7 +70,6 @@
       "headless": true,
       "http_directory": "http",
       "iso_checksum": "{{user `build_iso_checksum`}}",
-      "iso_checksum_type": "{{user `build_iso_checksum_type`}}",
       "iso_interface": "sata",
       "iso_target_path": "{{user `build_iso_target_path`}}",
       "iso_url": "{{user `build_iso_target_path`}}/{{user `build_iso_filename`}}",
