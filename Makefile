@@ -253,16 +253,18 @@ download-iso: _prerequisites _require-supported-architecture
 		fi; \
 		echo "$(PREFIX_STEP)Downloading ISO: http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
 		$(curl) \
+			--fail \
 			--location \
-			--progress-bar \
+			--silent \
 			--output ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
 			http://mirrors.kernel.org/centos/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
 		if [[ $${?} -ne 0 ]]; then \
 			rm -f ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) &> /dev/null; \
 			echo "$(PREFIX_STEP)Download failed - trying vault: http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME)"; \
 			$(curl) \
+				--fail \
 				--location \
-				--progress-bar \
+				--silent \
 				--output ./isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME) \
 				http://archive.kernel.org/centos-vault/$(BOX_VERSION_RELEASE)/isos/$(BOX_ARCH)/$(SOURCE_ISO_NAME); \
 		fi; \
