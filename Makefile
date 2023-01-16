@@ -29,6 +29,9 @@ Variables (default value):
                             an additonal locale to en_US. e.g. en_GB
   - BOX_OUTPUT_PATH         Ouput directory path - where the final build
     (./builds)              artifacts are placed.
+  - BOX_PROVIDER            Used to specify provider. i.e.
+    (virtualbox)              - virtualbox
+                              - libvirt
   - BOX_VARIANT (Minimal)   Used to specify box build variants. i.e.
                               - Minimal
                               - Minimal-AMI
@@ -39,13 +42,13 @@ Variables (default value):
 endef
 
 BOX_NAMESPACE := jdeathe
-BOX_PROVIDOR := virtualbox
 BOX_ARCH_PATTERN := ^x86_64$
 BOX_ARCH := x86_64
 
 BOX_DEBUG ?= false
 BOX_LANG ?= en_US
 BOX_OUTPUT_PATH ?= ./builds
+BOX_PROVIDER ?= virtualbox
 BOX_VARIANT ?= Minimal
 BOX_VERSION_RELEASE ?= 7.7.1908
 
@@ -104,7 +107,7 @@ PACKER_BUILD_NAME := $(shell \
 PACKER_TEMPLATE_NAME := $(shell \
 	printf -- 'CentOS-7-%s-%s.json' \
 		"$(BOX_VARIANT)" \
-		"$(BOX_PROVIDOR)"; \
+		"$(BOX_PROVIDER)"; \
 )
 PACKER_VAR_FILE := $(shell \
 	printf -- 'CentOS-%s-%s-%s-%s.json' \
@@ -123,7 +126,10 @@ SOURCE_ISO_NAME := $(shell \
 curl := $(shell type -p curl)
 gzip := $(shell type -p gzip)
 openssl := $(shell type -p openssl)
+virsh := $(shell type -p virsh)
 packer := $(shell type -p packer)
+qemu-img := $(shell type -p qemu-img)
+qemu-system-x86_64 := $(shell type -p qemu-system-x86_64)
 vagrant := $(shell type -p vagrant)
 vboxmanage := $(shell type -p vboxmanage)
 
@@ -137,10 +143,6 @@ vboxmanage := $(shell type -p vboxmanage)
 	install
 
 _prerequisites:
-ifeq ($(vboxmanage),)
-	$(error "Please install VirtualBox. (https://www.virtualbox.org/)")
-endif
-
 ifeq ($(vagrant),)
 	$(error "Please install Vagrant. (https://www.vagrantup.com)")
 endif
@@ -161,10 +163,28 @@ ifeq ($(openssl),)
 	$(error "Please install the openssl package.")
 endif
 
+ifeq ($(BOX_PROVIDER),virtualbox)
+ifeq ($(vboxmanage),)
+	$(error "Please install VirtualBox. (https://www.virtualbox.org))
+endif
+endif
+
+ifeq ($(BOX_PROVIDER),libvirt)
+ifeq ($(virsh),)
+	$(error "Please install LibVirt. (https://libvirt.org))
+endif
+ifeq ($(qemu-system-x86_64),)
+	$(error "Please install QEMU. (https://www.qemu.org)")
+endif
+ifeq ($(qemu-img),)
+	$(error "Please install QEMU. (https://www.qemu.org)")
+endif
+endif
+
 _require-supported-architecture:
 	@ if [[ ! $(BOX_ARCH) =~ $(BOX_ARCH_PATTERN) ]]; then \
 		echo "$(PREFIX_STEP_NEGATIVE)Unsupported architecture ($(BOX_ARCH))" >&2; \
-		echo "$(PREFIX_SUB_STEP)Supported values: x86_64|i386." >&2; \
+		echo "$(PREFIX_SUB_STEP)Supported values: x86_64" >&2; \
 		exit 1; \
 	fi
 
@@ -183,7 +203,7 @@ build: _prerequisites _require-supported-architecture | download-iso
 		exit 1; \
 	else \
 		if [[ $(BOX_DEBUG) == true ]]; then \
-			$(packer) build \
+			PACKER_LOG=1 $(packer) build \
 				-debug \
 				-force \
 				-var-file=$(PACKER_VAR_FILE) \
@@ -195,21 +215,32 @@ build: _prerequisites _require-supported-architecture | download-iso
 				$(PACKER_TEMPLATE_NAME); \
 		fi; \
 		if [[ $${?} -eq 0 ]]; then \
-			if [[ -s $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box ]]; then \
+			if [[ -s $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDER).box ]]; then \
 				$(openssl) sha1 \
-					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box \
+					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDER).box \
 					| awk '{ print $$2; }' \
-					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box.sha1; \
+					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDER).box.sha1; \
 			elif [[ -s $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova ]]; then \
 				$(openssl) sha1 \
 					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova \
 					| awk '{ print $$2; }' \
 					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova.sha1; \
+			elif [[ -s $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).vmdk ]]; then \
+				$(openssl) sha1 \
+					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).vmdk \
+					| awk '{ print $$2; }' \
+					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).vmdk.sha1; \
+			elif [[ -s $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw ]]; then \
+				$(openssl) sha1 \
+					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw \
+					| awk '{ print $$2; }' \
+					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw.sha1; \
 			fi; \
 			echo "$(PREFIX_SUB_STEP_POSITIVE)Build complete"; \
 		else \
-			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box.sha1 &> /dev/null; \
+			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDER).box.sha1 &> /dev/null; \
 			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova.sha1 &> /dev/null; \
+			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw.sha1 &> /dev/null; \
 			echo "$(PREFIX_SUB_STEP_NEGATIVE)Build error" >&2; \
 			exit 1; \
 		fi; \
@@ -251,18 +282,18 @@ install: _prerequisites _require-supported-architecture
 	))
 	$(eval $@_box_checksum := $(shell \
 		$(openssl) sha1 \
-			$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box \
+			$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDER).box \
 			| awk '{ print $$2; }' \
 	))
 	$(eval $@_box_hash := $(shell \
 		echo "$($@_box_checksum)" \
 			| cut -c1-8 \
 	))
-	@ if [[ -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box ]]; then \
+	@ if [[ -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDER).box ]]; then \
 		echo "$(PREFIX_STEP)Installing $(BOX_NAMESPACE)/$($@_box_name)/$($@_box_hash)"; \
 		$(vagrant) box add --force \
 			--name $(BOX_NAMESPACE)/$($@_box_name)/$($@_box_hash) \
-			$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDOR).box; \
+			$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDER).box; \
 		echo "$(PREFIX_STEP)Vagrantfile:"; \
 		$(vagrant) init --output - --minimal $(BOX_NAMESPACE)/$($@_box_name)/$($@_box_hash); \
 	else \

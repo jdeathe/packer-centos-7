@@ -60,6 +60,8 @@
         " VG_ROOT_RESERVED_SPACE={{user `guest_vg_root_reserved_space`}}",
         "<enter><wait>"
       ],
+      "boot_key_interval": "10ms",
+      "boot_keygroup_interval": "1s",
       "boot_wait": "3s",
       "disk_size": "{{user `guest_hard_disk_size`}}",
       "format": "{{user `build_export_format`}}",

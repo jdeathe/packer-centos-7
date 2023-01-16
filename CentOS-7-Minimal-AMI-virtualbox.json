@@ -59,6 +59,8 @@
         " VG_ROOT_RESERVED_SPACE={{user `guest_vg_root_reserved_space`}}",
         "<enter><wait>"
       ],
+      "boot_key_interval": "10ms",
+      "boot_keygroup_interval": "1s",
       "boot_wait": "3s",
       "disk_size": "{{user `guest_hard_disk_size`}}",
       "format": "{{user `build_export_format`}}",
@@ -120,7 +122,7 @@
       "inline": [
         "if [[ -n ${1} ]] && [[ -n ${2} ]] && [[ -n ${PACKER_BUILD_NAME} ]] && [[ -d output-${PACKER_BUILD_NAME} ]]; then",
         "  echo '--> Moving build artifact.'",
-        "  mv -f output-${PACKER_BUILD_NAME}/${PACKER_BUILD_NAME}.${2} ${1}/${PACKER_BUILD_NAME}.${2}",
+        "  mv -f output-${PACKER_BUILD_NAME}/${PACKER_BUILD_NAME} ${1}/${PACKER_BUILD_NAME}.${2}",
         "fi",
         "echo '--> Cleanup output directories.'",
         "find . -mindepth 1 -maxdepth 1 -type d -name \"output-*\" -exec rm -rf '{}' +"
