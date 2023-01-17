@@ -87,8 +87,7 @@
       "ssh_wait_timeout": "10m",
       "shutdown_command": "/sbin/shutdown --no-wall -P now",
       "shutdown_timeout": "1m",
-      "vm_name": "{{user `guest_name`}}",
-      "qemuargs": [[ "-global", "virtio-pci.disable-modern=on" ]]
+      "vm_name": "{{user `guest_name`}}"
     }
   ],
   "post-processors": [
