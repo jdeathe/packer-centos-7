@@ -52,6 +52,8 @@ BOX_PROVIDER ?= virtualbox
 BOX_VARIANT ?= Minimal
 BOX_VERSION_RELEASE ?= 7.7.1908
 
+BUILD_OS := $(shell uname -s)
+
 # UI constants
 COLOUR_NEGATIVE := \033[1;31m
 COLOUR_POSITIVE := \033[1;32m
@@ -202,11 +204,24 @@ build: _prerequisites _require-supported-architecture | download-iso
 		echo "$(PREFIX_SUB_STEP_NEGATIVE)Missing template: $(PACKER_TEMPLATE_NAME)" >&2; \
 		exit 1; \
 	else \
-		if [[ $(BOX_DEBUG) == true ]]; then \
+		if [[ $(BOX_DEBUG) == true ]] && [[ $(BUILD_OS) == Darwin ]]; then \
 			PACKER_LOG=1 $(packer) build \
 				-debug \
 				-force \
 				-var-file=$(PACKER_VAR_FILE) \
+				-var 'build_accelerator=hvf' \
+				$(PACKER_TEMPLATE_NAME); \
+		elif [[ $(BOX_DEBUG) == true ]]; then \
+			PACKER_LOG=1 $(packer) build \
+				-debug \
+				-force \
+				-var-file=$(PACKER_VAR_FILE) \
+				$(PACKER_TEMPLATE_NAME); \
+		elif [[ $(BUILD_OS) == Darwin ]]; then \
+			$(packer) build \
+				-force \
+				-var-file=$(PACKER_VAR_FILE) \
+				-var 'build_accelerator=hvf' \
 				$(PACKER_TEMPLATE_NAME); \
 		else \
 			$(packer) build \

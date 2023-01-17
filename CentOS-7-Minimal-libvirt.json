@@ -40,7 +40,7 @@
     {
       "type": "qemu",
       "name": "{{user `build_name`}}",
-      "accelerator": "kvm",
+      "accelerator": "{{user `build_accelerator`}}",
       "boot_command": [
         "<esc><wait>",
         "linux ks=http://{{.HTTPIP}}:{{.HTTPPort}}/centos-7-minimal.cfg",
@@ -87,7 +87,8 @@
       "ssh_wait_timeout": "10m",
       "shutdown_command": "/sbin/shutdown --no-wall -P now",
       "shutdown_timeout": "1m",
-      "vm_name": "{{user `guest_name`}}"
+      "vm_name": "{{user `guest_name`}}",
+      "qemuargs": [[ "-global", "virtio-pci.disable-modern=on" ]]
     }
   ],
   "post-processors": [
