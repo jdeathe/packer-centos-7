@@ -37,7 +37,7 @@ Variables (default value):
                               - Minimal-AMI
                               - Minimal-Cloud-Init
   - BOX_VERSION_RELEASE     The CentOS-7 Minor Release number. Note: A
-    (7.7.1908)              corresponding template is required.
+    (7.9.2009)              corresponding template is required.
 
 endef
 
@@ -50,7 +50,7 @@ BOX_LANG ?= en_US
 BOX_OUTPUT_PATH ?= ./builds
 BOX_PROVIDER ?= virtualbox
 BOX_VARIANT ?= Minimal
-BOX_VERSION_RELEASE ?= 7.7.1908
+BOX_VERSION_RELEASE ?= 7.9.2009
 
 BUILD_OS := $(shell uname -s)
 
@@ -204,7 +204,7 @@ build: _prerequisites _require-supported-architecture | download-iso
 		echo "$(PREFIX_SUB_STEP_NEGATIVE)Missing template: $(PACKER_TEMPLATE_NAME)" >&2; \
 		exit 1; \
 	else \
-		elif [[ $(BOX_DEBUG) == true ]]; then \
+		if [[ $(BOX_DEBUG) == true ]]; then \
 			PACKER_LOG=1 $(packer) build \
 				-debug \
 				-force \

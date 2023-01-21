@@ -1,12 +1,8 @@
 # Importing an OVA VM Image to an AWS EC2 AMI
 
 ## Prerequisites
-- [Install](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and [configure](http://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html) the AWS CLI.
-  ```
-  # On OSX
-  $ easy_install awscli 
-  ```
-- Follow the guidance in [VMImportPrerequisites](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/VMImportPrerequisites.html).
+- [Install](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and [configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) the AWS CLI.
+- Follow the guidance in [VM Import/Export Prerequisites](https://docs.aws.amazon.com/vm-import/latest/userguide/vmimport-image-import.html#import-image-prereqs).
 - For non-root IAM users you may need to attach the following inline policy to the `vmimport` service role.
   ```
   {
@@ -45,16 +41,16 @@ Upload the `vmdk`,`ova` or `raw` format image to the S3 bucket `{{bucket_name}}`
 
 ```
 $ aws s3 cp \
-  builds/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.vmdk \
-  s3://{{bucket_name}}/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.vmdk
+  builds/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US.vmdk \
+  s3://{{bucket_name}}/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US.vmdk
 ```
 
 <!-- ### Copy an Image Between Reigional Buckets
 
 ```
 $ aws s3 cp \
-  s3://{{source_bucket_name}}/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.vmdk \
-  s3://{{target_bucket_name}}/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.vmdk
+  s3://{{source_bucket_name}}/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US.vmdk \
+  s3://{{target_bucket_name}}/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US.vmdk
 ``` -->
 
 ### Import
@@ -67,15 +63,15 @@ This will return some output that includes an ImportTaskId. e.g. `import-ami-08e
 <!-- ```
 $ aws ec2 import-image \
   --region eu-west-1 \
-  --cli-input-json '{ "LicenseType": "BYOL", "Description": "jdeathe/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US", "DiskContainers": [ { "Description": "jdeathe/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US", "Format": "vmdk", "UserBucket": { "S3Bucket": "{{bucket_name}}", "S3Key" : "CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.vmdk" } } ]}'
+  --cli-input-json '{ "LicenseType": "BYOL", "Description": "jdeathe/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US", "DiskContainers": [ { "Description": "jdeathe/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US", "Format": "vmdk", "UserBucket": { "S3Bucket": "{{bucket_name}}", "S3Key" : "CentOS-7.9.2009-x86_64-Minimal-AMI-en_US.vmdk" } } ]}'
 ``` -->
 
 ```
 $ aws ec2 import-image \
   --architecture x86_64 \
   --boot-mode legacy-bios \
-  --description "jdeathe/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US" \
-  --disk-containers '[ { "Description": "jdeathe/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US", "Format": "raw", "UserBucket": { "S3Bucket": "{{bucket_name}}", "S3Key" : "CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.raw" } } ]' \
+  --description "jdeathe/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US" \
+  --disk-containers '[ { "Description": "jdeathe/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US", "Format": "raw", "UserBucket": { "S3Bucket": "{{bucket_name}}", "S3Key" : "CentOS-7.9.2009-x86_64-Minimal-AMI-en_US.vmdk" } } ]' \
   --license-type BYOL \
   --platform Linux \
   --region eu-west-1
@@ -114,7 +110,7 @@ $ aws ec2 copy-image \
   --source-region eu-west-1 \
   --region eu-west-1 \
   --name "jdeathe/centos-7-x86_64-minimal-en_us-v7.7.0" \
-  --description "CentOS-7.7.1908 x86_64 Minimal Base Image - en_US locale" \
+  --description "CentOS-7.9.2009 x86_64 Minimal Base Image - en_US locale" \
   --source-image-id {{ImageId}}
 ```
 
@@ -151,5 +147,5 @@ Remove the source image from the S3 bucket.
 
 ```
 $ aws s3 rm \
-  s3://{{bucket_name}}/CentOS-7.7.1908-x86_64-Minimal-AMI-en_US.vmdk
+  s3://{{bucket_name}}/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US.vmdk
 ```

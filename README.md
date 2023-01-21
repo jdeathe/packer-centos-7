@@ -3,6 +3,7 @@
 This provides the configuration and Makefile to build a [Vagrant](https://www.vagrantup.com) minimal base box using [Packer](https://www.packer.io). The base box is intended for server (terminal) use only so is restricted to a single locale (with `en_US` being the default) which allows for a smaller box size.
 
 There are templates provided for the following with `x86_64` architecture:
+- CentOS-7.9.2009
 - CentOS-7.7.1908
 - CentOS-7.6.1810
 - CentOS-7.5.1804
@@ -20,7 +21,7 @@ The build environment required is Mac OSX or GNU Linux (Fedora 37).
 
 To build the box file you will need the following installed:
 
-- [VirtualBox](https://www.virtualbox.org) (6.0.12)
+- [VirtualBox](https://www.virtualbox.org) (7.0.6)
 - [LibVirt](https://libvirt.org) (8.6.0)
 - [Vagrant](https://www.vagrantup.com) (2.2.19)
 - [Packer](https://www.packer.io) (1.85)
