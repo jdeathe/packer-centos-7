@@ -19,14 +19,14 @@ There is currently no requirement to support older minor release versions or alt
 
 The build environment required is Mac OSX or GNU Linux (Fedora 37).
 
-To build the box file you will need the following installed:
+To build the box files you will need the following installed. Version numbers are those used to build on Fedora 37.
 
-- [VirtualBox](https://www.virtualbox.org) (7.0.4)
+- [VirtualBox](https://www.virtualbox.org) (7.0.4_rpmfusion)
 - [LibVirt](https://libvirt.org) (8.6.0)
 - [Vagrant](https://www.vagrantup.com) (2.2.19)
-- [Packer](https://www.packer.io) (1.85)
+- [Packer](https://www.packer.io) (1.8.5)
 
-_NOTE_: You may need to create the NAT Network 10.0.2.0/24 if it doesn't already exist.
+_NOTE_: You may need to create the VirtualBox NAT Network 10.0.2.0/24 if it doesn't already exist.
 
 ### Build
 
