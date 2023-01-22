@@ -232,17 +232,12 @@ build: _prerequisites _require-supported-architecture | download-iso
 					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).vmdk \
 					| awk '{ print $$2; }' \
 					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).vmdk.sha1; \
-			elif [[ -s $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw ]]; then \
-				$(openssl) sha1 \
-					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw \
-					| awk '{ print $$2; }' \
-					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw.sha1; \
 			fi; \
 			echo "$(PREFIX_SUB_STEP_POSITIVE)Build complete"; \
 		else \
 			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDER).box.sha1 &> /dev/null; \
 			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova.sha1 &> /dev/null; \
-			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw.sha1 &> /dev/null; \
+			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).vmdk.sha1 &> /dev/null; \
 			echo "$(PREFIX_SUB_STEP_NEGATIVE)Build error" >&2; \
 			exit 1; \
 		fi; \

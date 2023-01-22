@@ -63,7 +63,6 @@
         "<enter><wait>"
       ],
       "boot_key_interval": "10ms",
-      "boot_keygroup_interval": "500ms",
       "boot_wait": "3s",
       "disk_interface": "virtio",
       "disk_discard": "unmap",
