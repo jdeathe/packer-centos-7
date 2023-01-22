@@ -64,7 +64,7 @@
       ],
       "boot_key_interval": "10ms",
       "boot_wait": "3s",
-      "disk_interface": "virtio",
+      "disk_interface": "virtio-scsi",
       "disk_discard": "unmap",
       "disk_detect_zeroes": "on",
       "disk_cache": "unsafe",
@@ -80,6 +80,10 @@
       "machine_type": "q35",
       "memory": "{{user `guest_memory`}}",
       "net_device": "virtio-net",
+      "qemuargs": [
+        [ "-global", "virtio-pci.disable-modern=on" ],
+        [ "-cpu", "host" ]
+      ],
       "ssh_username": "root",
       "ssh_password": "{{user `ssh_root_password`}}",
       "ssh_port": 22,

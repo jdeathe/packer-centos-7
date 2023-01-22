@@ -204,10 +204,23 @@ build: _prerequisites _require-supported-architecture | download-iso
 		echo "$(PREFIX_SUB_STEP_NEGATIVE)Missing template: $(PACKER_TEMPLATE_NAME)" >&2; \
 		exit 1; \
 	else \
-		if [[ $(BOX_DEBUG) == true ]]; then \
+		if [[ $(BOX_DEBUG) == true ]] && [[ $(BUILD_OS) == Darwin ]]; then \
 			PACKER_LOG=1 $(packer) build \
 				-debug \
 				-force \
+				-var 'build_accelerator=hvf' \
+				-var-file=$(PACKER_VAR_FILE) \
+				$(PACKER_TEMPLATE_NAME); \
+		elif [[ $(BOX_DEBUG) == true ]]; then \
+			PACKER_LOG=1 $(packer) build \
+				-debug \
+				-force \
+				-var-file=$(PACKER_VAR_FILE) \
+				$(PACKER_TEMPLATE_NAME); \
+		elif [[ $(BUILD_OS) == Darwin ]]; then \
+			$(packer) build \
+				-force \
+				-var 'build_accelerator=hvf' \
 				-var-file=$(PACKER_VAR_FILE) \
 				$(PACKER_TEMPLATE_NAME); \
 		else \
