@@ -37,7 +37,7 @@ Variables (default value):
                               - Minimal-AMI
                               - Minimal-Cloud-Init
   - BOX_VERSION_RELEASE     The CentOS-7 Minor Release number. Note: A
-    (7.7.1908)              corresponding template is required.
+    (7.9.2009)              corresponding template is required.
 
 endef
 
@@ -50,7 +50,7 @@ BOX_LANG ?= en_US
 BOX_OUTPUT_PATH ?= ./builds
 BOX_PROVIDER ?= virtualbox
 BOX_VARIANT ?= Minimal
-BOX_VERSION_RELEASE ?= 7.7.1908
+BOX_VERSION_RELEASE ?= 7.9.2009
 
 BUILD_OS := $(shell uname -s)
 
@@ -204,10 +204,23 @@ build: _prerequisites _require-supported-architecture | download-iso
 		echo "$(PREFIX_SUB_STEP_NEGATIVE)Missing template: $(PACKER_TEMPLATE_NAME)" >&2; \
 		exit 1; \
 	else \
+		if [[ $(BOX_DEBUG) == true ]] && [[ $(BUILD_OS) == Darwin ]]; then \
+			PACKER_LOG=1 $(packer) build \
+				-debug \
+				-force \
+				-var 'build_accelerator=hvf' \
+				-var-file=$(PACKER_VAR_FILE) \
+				$(PACKER_TEMPLATE_NAME); \
 		elif [[ $(BOX_DEBUG) == true ]]; then \
 			PACKER_LOG=1 $(packer) build \
 				-debug \
 				-force \
+				-var-file=$(PACKER_VAR_FILE) \
+				$(PACKER_TEMPLATE_NAME); \
+		elif [[ $(BUILD_OS) == Darwin ]]; then \
+			$(packer) build \
+				-force \
+				-var 'build_accelerator=hvf' \
 				-var-file=$(PACKER_VAR_FILE) \
 				$(PACKER_TEMPLATE_NAME); \
 		else \
@@ -232,17 +245,12 @@ build: _prerequisites _require-supported-architecture | download-iso
 					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).vmdk \
 					| awk '{ print $$2; }' \
 					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).vmdk.sha1; \
-			elif [[ -s $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw ]]; then \
-				$(openssl) sha1 \
-					$(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw \
-					| awk '{ print $$2; }' \
-					> $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw.sha1; \
 			fi; \
 			echo "$(PREFIX_SUB_STEP_POSITIVE)Build complete"; \
 		else \
 			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME)-$(BOX_PROVIDER).box.sha1 &> /dev/null; \
 			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).ova.sha1 &> /dev/null; \
-			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).raw.sha1 &> /dev/null; \
+			rm -f $(BOX_OUTPUT_PATH)/$(PACKER_BUILD_NAME).vmdk.sha1 &> /dev/null; \
 			echo "$(PREFIX_SUB_STEP_NEGATIVE)Build error" >&2; \
 			exit 1; \
 		fi; \
