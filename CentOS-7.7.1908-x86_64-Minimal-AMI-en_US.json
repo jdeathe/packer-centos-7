@@ -1,4 +1,5 @@
 {
+  "build_accelerator": "kvm",
   "build_iso_checksum": "9a2c47d97b9975452f7d582264e9fc16d108ed8252ac6816239a3b58cef5c53d",
   "build_iso_checksum_type": "sha256",
   "build_iso_filename": "CentOS-7-x86_64-Minimal-1908.iso",
