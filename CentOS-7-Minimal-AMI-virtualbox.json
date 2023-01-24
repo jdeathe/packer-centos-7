@@ -122,7 +122,7 @@
       "inline": [
         "if [[ -n ${1} ]] && [[ -n ${2} ]] && [[ -n ${PACKER_BUILD_NAME} ]] && [[ -d output-${PACKER_BUILD_NAME} ]]; then",
         "  echo '--> Moving build artifact.'",
-        "  mv -f output-${PACKER_BUILD_NAME}/${PACKER_BUILD_NAME} ${1}/${PACKER_BUILD_NAME}.${2}",
+        "  mv -f output-${PACKER_BUILD_NAME}/${PACKER_BUILD_NAME}.${2} ${1}/${PACKER_BUILD_NAME}.${2}",
         "fi",
         "echo '--> Cleanup output directories.'",
         "find . -mindepth 1 -maxdepth 1 -type d -name \"output-*\" -exec rm -rf '{}' +"
