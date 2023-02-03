@@ -71,7 +71,7 @@ $ aws ec2 import-image \
   --architecture x86_64 \
   --boot-mode legacy-bios \
   --description "jdeathe/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US" \
-  --disk-containers '[ { "Description": "jdeathe/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US", "Format": "raw", "UserBucket": { "S3Bucket": "{{bucket_name}}", "S3Key" : "CentOS-7.9.2009-x86_64-Minimal-AMI-en_US.vmdk" } } ]' \
+  --disk-containers '[ { "Description": "jdeathe/CentOS-7.9.2009-x86_64-Minimal-AMI-en_US", "Format": "vmdk", "UserBucket": { "S3Bucket": "{{bucket_name}}", "S3Key" : "CentOS-7.9.2009-x86_64-Minimal-AMI-en_US.vmdk" } } ]' \
   --license-type BYOL \
   --platform Linux \
   --region eu-west-1
@@ -109,7 +109,7 @@ Create copy of the intermediate image with required name and description values 
 $ aws ec2 copy-image \
   --source-region eu-west-1 \
   --region eu-west-1 \
-  --name "jdeathe/centos-7-x86_64-minimal-en_us-v7.7.0" \
+  --name "jdeathe/centos-7-x86_64-minimal-en_us-v7.9.0" \
   --description "CentOS-7.9.2009 x86_64 Minimal Base Image - en_US locale" \
   --source-image-id {{ImageId}}
 ```
